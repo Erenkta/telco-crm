@@ -63,7 +63,7 @@ Her servisin kendi Postgres DB'si var. Discovery=Eureka, Config=Config Server, A
 **Öğrenilecek konular:** Maven multi-module proje yapısı, parent POM, Git branch stratejisi.
 
 **Görevler:**
-- [ ] Yeni bir Git reposu aç (referans repoyu fork/clone ETME — sıfırdan başla).
+- [x] Yeni bir Git reposu aç (referans repoyu fork/clone ETME — sıfırdan başla).
 - [ ] Kök dizinde parent `pom.xml` oluştur (packaging: pom), ortak dependency versiyonlarını `<dependencyManagement>` altında topla.
 - [ ] JDK 21, Maven 3.x, Docker Desktop kurulumlarını doğrula.
 - [ ] Boş bir `docker-compose.yml` iskeleti oluştur (şimdilik sadece Postgres + Redis servisleri).
