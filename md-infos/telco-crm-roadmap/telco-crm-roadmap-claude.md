@@ -65,7 +65,7 @@ Her servisin kendi Postgres DB'si var. Discovery=Eureka, Config=Config Server, A
 **Görevler:**
 - [x] Yeni bir Git reposu aç (referans repoyu fork/clone ETME — sıfırdan başla).
 - [ ] Kök dizinde parent `pom.xml` oluştur (packaging: pom), ortak dependency versiyonlarını `<dependencyManagement>` altında topla.
-- [ ] JDK 21, Maven 3.x, Docker Desktop kurulumlarını doğrula.
+- [x] JDK 21, Maven 3.x, Docker Desktop kurulumlarını doğrula.
 - [ ] Boş bir `docker-compose.yml` iskeleti oluştur (şimdilik sadece Postgres + Redis servisleri).
 
 **Çıktı / Definition of Done:** `mvn clean install` kök dizinde hatasız çalışıyor, `docker compose up -d` ile Postgres ayağa kalkıyor.
