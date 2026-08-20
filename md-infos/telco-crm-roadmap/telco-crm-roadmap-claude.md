@@ -72,6 +72,13 @@ Her servisin kendi Postgres DB'si var. Discovery=Eureka, Config=Config Server, A
 
 **Kendine sorman gereken soru:** Neden tek repo (monorepo) tercih ediyoruz, her servisi ayrı repo yapsak ne kaybederdik?
 
+Cevap : CICD ve yönetim işlemlerinden ziyade 2 temel konu daha var : 
+1- Atomik değişiklik (version skew'in önüne geçmek) : Farklı repolar demek 2 ayrı deploy işlemi demek. Aradaki süre boyunca tutarsızlıklar olabileceğinden dolayı monorepo tercih edilir.
+2-Ortak bağımlılık versiyonlaması : pom.xml içerisinde <dependencyManagement/> bloğunu kullanarak versiyon yönetimini tek bir yerden yapıyoruz.
+
+Yazılımda hiçbir çözüm silver bullet olmadığı için trade-off'unu da bilmekte fayda var : 
+Proje büyüdükçe CI/CD build süresi artar.
+
 ---
 
 ## FAZ 1 — Discovery Server + Config Server (1 hafta)
