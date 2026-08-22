@@ -24,3 +24,13 @@ Eureka $\rightarrow$ Eureka (Peer Replication)
 - **Registry State Transfer:** `peer1` sadece kendi aldığı kaydı değil, client'lardan gelen heartbeat (yenileme) ve cancel (kapanma) isteklerini de anlık olarak `peer2`'ye iletir.
     
 - **Tüm Liste Değil, Deltalar:** Her seferinde tüm veritabanı baştan sona gönderilmez. Sadece değişen durumlar (yeni eklenen, silinen veya güncellenen servisler - _delta_) replike edilir. Böylece ağ trafiği minimumda tutulur.
+
+---------------------------------------------------------------------
+Gerçek productionda config server'ı kurarken .properties dosyalarını koymak için ayrı bir repo tercih edilir çünkü :
+1- Config değişikliği kod deployunu tetiklememeli
+2- Config reposuna olan erişim genelde farklı olabilir
+3- Kod PR süreci ile config PR süreci farklı olabilir.
+
+Bundan dolayı production projelerde ayrı repo tercih edilmelidir.
+
+---------------------------------------------------------------------
