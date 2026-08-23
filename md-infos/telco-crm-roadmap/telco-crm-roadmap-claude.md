@@ -88,8 +88,8 @@ Proje büyüdükçe CI/CD build süresi artar.
 **Görevler:**
 - [x] `discovery-server` modülü: `spring-cloud-starter-netflix-eureka-server`, `@EnableEurekaServer`.
 - [x] `config-server` modülü: `spring-cloud-config-server`, native profil ile `configs/` klasöründen dosya oku (Git backend değil, native — repoyla aynı).
-- [ ] Her iki servisi de Docker Compose'a ekle (portlar: 8761, 8888).
-- [ ] Basit bir "hello-service" yaz, Eureka'ya kayıt olduğunu ve config-server'dan bir property çektiğini doğrula, sonra bu servisi sil (öğrenme amaçlı).
+- [x] Her iki servisi de Docker Compose'a ekle (portlar: 8761, 8888).
+- [x] Basit bir "hello-service" yaz, Eureka'ya kayıt olduğunu ve config-server'dan bir property çektiğini doğrula, sonra bu servisi sil (öğrenme amaçlı).
 
 **Çıktı:** Eureka dashboard'unda (localhost:8761) test servisin görünüyor, config-server bir `application.yml`'i native profille serve ediyor.
 
