@@ -34,3 +34,5 @@ Gerçek productionda config server'ı kurarken .properties dosyalarını koymak 
 Bundan dolayı production projelerde ayrı repo tercih edilmelidir.
 
 ---------------------------------------------------------------------
+Eureka - Config Server - Hello Service arka planda nasıl çalışıyor ? 
+
