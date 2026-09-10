@@ -102,9 +102,9 @@ Proje büyüdükçe CI/CD build süresi artar.
 **Öğrenilecek konular:** Katmanlı mimari (controller/service/repository), Flyway migration, DTO/Entity ayrımı, MapStruct.
 
 **Görevler:**
-- [ ] `identity-service`: User/Role/Permission entity'leri, Postgres, Flyway ile ilk migration (`V1__init.sql`).
-- [ ] CRUD endpoint'leri: kullanıcı oluştur/listele/güncelle/sil.
-- [ ] MapStruct ile Entity↔DTO mapping (elle yazma, kod üretimini gözlemle).
+- [x] `identity-service`: User/Role/Permission entity'leri, Postgres, Flyway ile ilk migration (`V1__init.sql`).
+- [x] CRUD endpoint'leri: kullanıcı oluştur/listele/güncelle/sil.
+- [x] MapStruct ile Entity↔DTO mapping (elle yazma, kod üretimini gözlemle).
 - [ ] Birim testler: service katmanı için Mockito ile mock repository.
 - [ ] Eureka'ya kayıt ol, config-server'dan config çek.
 
