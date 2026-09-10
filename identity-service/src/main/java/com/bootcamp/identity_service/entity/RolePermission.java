@@ -33,6 +33,6 @@ public class RolePermission {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Permission permission;
 
-    private OffsetDateTime assigned_at;
+    private OffsetDateTime assignedAt;
     private String assignedBy;
 }

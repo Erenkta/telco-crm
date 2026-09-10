@@ -14,6 +14,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+
 @Builder(toBuilder = true)
 public class IdentityAuditLog {
     @Id
