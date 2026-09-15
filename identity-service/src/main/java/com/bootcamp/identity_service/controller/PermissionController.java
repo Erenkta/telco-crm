@@ -3,7 +3,6 @@ package com.bootcamp.identity_service.controller;
 
 import com.bootcamp.identity_service.dto.request.CreatePermissionRequest;
 import com.bootcamp.identity_service.dto.response.PermissionResponse;
-import com.bootcamp.identity_service.entity.Permission;
 import com.bootcamp.identity_service.service.PermissionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
