@@ -25,11 +25,11 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse create(CreateUserRequest user) {
-        if(!userRepository.existsByUsername(user.username())){
+        if(userRepository.existsByUsername(user.username())){
             String message = String.format("User with username %s is already exists",user.username());
             throw new RecordAlreadyExistException(message);
         }
-        if(!userRepository.existsByEmail(user.email())){
+        if(userRepository.existsByEmail(user.email())){
             String message = String.format("User with email %s is already exists",user.email());
             throw new RecordAlreadyExistException(message);
         }
