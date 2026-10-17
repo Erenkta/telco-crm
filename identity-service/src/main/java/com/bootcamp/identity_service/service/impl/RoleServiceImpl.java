@@ -10,7 +10,6 @@ import com.bootcamp.identity_service.mapper.RoleMapper;
 import com.bootcamp.identity_service.repository.RoleRepository;
 import com.bootcamp.identity_service.service.RoleService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,16 +26,11 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional
     public RoleResponse create(CreateRoleRequest role) {
-        try{
-            if(roleRepository.existsByName(role.name())){
-                String message = String.format("Role with name %s is already exists",role.name());
-                throw new RecordAlreadyExistException(message, ModuleEnum.IDENTITY_SERVICE);
-            }
-            return mapper.toResponse(roleRepository.saveAndFlush(mapper.toEntity(role)));
-        }catch (DataIntegrityViolationException ex){
-            String message = String.format("Role with name %s is already exists",role.name());
+        if(roleRepository.existsByName(role.name())){
+            String message = String.format("Role with name %s already exists",role.name());
             throw new RecordAlreadyExistException(message, ModuleEnum.IDENTITY_SERVICE);
         }
+        return mapper.toResponse(roleRepository.saveAndFlush(mapper.toEntity(role)));
     }
 
     @Override

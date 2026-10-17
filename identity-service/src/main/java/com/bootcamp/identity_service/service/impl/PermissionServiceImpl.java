@@ -11,7 +11,6 @@ import com.bootcamp.identity_service.repository.PermissionRepository;
 import com.bootcamp.identity_service.service.PermissionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -28,16 +27,11 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     @Transactional
     public PermissionResponse create(CreatePermissionRequest permission) {
-        try{
-            if(permissionRepository.existsByName(permission.name())){
-                String message = String.format("Permission with name %s is already exists",permission.name());
-                throw new RecordAlreadyExistException(message, ModuleEnum.IDENTITY_SERVICE);
-            }
-            return mapper.toResponse(permissionRepository.saveAndFlush(mapper.toEntity(permission)));
-        }catch (DataIntegrityViolationException ex){
-            String message = String.format("Permission with name %s is already exists",permission.name());
+        if(permissionRepository.existsByName(permission.name())){
+            String message = String.format("Permission with name %s already exists",permission.name());
             throw new RecordAlreadyExistException(message, ModuleEnum.IDENTITY_SERVICE);
         }
+        return mapper.toResponse(permissionRepository.saveAndFlush(mapper.toEntity(permission)));
     }
 
     @Override

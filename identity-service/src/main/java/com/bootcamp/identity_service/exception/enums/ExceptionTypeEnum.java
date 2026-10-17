@@ -7,5 +7,5 @@ public enum ExceptionTypeEnum {
     EXTERNAL_API_CALL,
     IO,
     TIMEOUT,
-    UNKNOWN,
+    UNKNOWN
 }
