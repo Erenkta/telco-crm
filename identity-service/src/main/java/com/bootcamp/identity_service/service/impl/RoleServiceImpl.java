@@ -3,11 +3,14 @@ package com.bootcamp.identity_service.service.impl;
 import com.bootcamp.identity_service.dto.request.CreateRoleRequest;
 import com.bootcamp.identity_service.dto.response.RoleResponse;
 import com.bootcamp.identity_service.entity.Role;
+import com.bootcamp.identity_service.exception.RecordAlreadyExistException;
 import com.bootcamp.identity_service.exception.RecordNotFoundException;
+import com.bootcamp.identity_service.exception.enums.ModuleEnum;
 import com.bootcamp.identity_service.mapper.RoleMapper;
 import com.bootcamp.identity_service.repository.RoleRepository;
 import com.bootcamp.identity_service.service.RoleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +27,16 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional
     public RoleResponse create(CreateRoleRequest role) {
-        return mapper.toResponse(roleRepository.save(mapper.toEntity(role)));
+        try{
+            if(roleRepository.existsByName(role.name())){
+                String message = String.format("Role with name %s is already exists",role.name());
+                throw new RecordAlreadyExistException(message, ModuleEnum.IDENTITY_SERVICE);
+            }
+            return mapper.toResponse(roleRepository.saveAndFlush(mapper.toEntity(role)));
+        }catch (DataIntegrityViolationException ex){
+            String message = String.format("Role with name %s is already exists",role.name());
+            throw new RecordAlreadyExistException(message, ModuleEnum.IDENTITY_SERVICE);
+        }
     }
 
     @Override
@@ -42,9 +54,10 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional
     public RoleResponse update(UUID id, CreateRoleRequest role) {
-        Role existingRole = mapper.toEntity(getById(id));
+        Role existingRole = roleRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("Role not found with id: " + id));
         mapper.updateEntityFromRequest(role,existingRole);
-        return mapper.toResponse(roleRepository.save(existingRole));
+        return mapper.toResponse(roleRepository.saveAndFlush(existingRole));
     }
 
     @Override

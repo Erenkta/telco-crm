@@ -3,12 +3,15 @@ package com.bootcamp.identity_service.service.impl;
 import com.bootcamp.identity_service.dto.request.CreatePermissionRequest;
 import com.bootcamp.identity_service.dto.response.PermissionResponse;
 import com.bootcamp.identity_service.entity.Permission;
+import com.bootcamp.identity_service.exception.RecordAlreadyExistException;
 import com.bootcamp.identity_service.exception.RecordNotFoundException;
+import com.bootcamp.identity_service.exception.enums.ModuleEnum;
 import com.bootcamp.identity_service.mapper.PermissionMapper;
 import com.bootcamp.identity_service.repository.PermissionRepository;
 import com.bootcamp.identity_service.service.PermissionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -25,7 +28,16 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     @Transactional
     public PermissionResponse create(CreatePermissionRequest permission) {
-        return mapper.toResponse(permissionRepository.save(mapper.toEntity(permission)));
+        try{
+            if(permissionRepository.existsByName(permission.name())){
+                String message = String.format("Permission with name %s is already exists",permission.name());
+                throw new RecordAlreadyExistException(message, ModuleEnum.IDENTITY_SERVICE);
+            }
+            return mapper.toResponse(permissionRepository.saveAndFlush(mapper.toEntity(permission)));
+        }catch (DataIntegrityViolationException ex){
+            String message = String.format("Permission with name %s is already exists",permission.name());
+            throw new RecordAlreadyExistException(message, ModuleEnum.IDENTITY_SERVICE);
+        }
     }
 
     @Override
@@ -43,9 +55,10 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     @Transactional
     public PermissionResponse update(UUID id, CreatePermissionRequest permission) {
-        Permission existingPermission = mapper.toEntity(getById(id));
+        Permission existingPermission = permissionRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("Permission not found with id: " + id));
         mapper.updateEntityFromRequest(permission,existingPermission);
-        return mapper.toResponse(permissionRepository.save(existingPermission));
+        return mapper.toResponse(permissionRepository.saveAndFlush(existingPermission));
     }
 
     @Override

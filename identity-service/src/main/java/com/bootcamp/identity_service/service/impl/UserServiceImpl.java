@@ -9,6 +9,7 @@ import com.bootcamp.identity_service.mapper.UserMapper;
 import com.bootcamp.identity_service.repository.UserRepository;
 import com.bootcamp.identity_service.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,15 +26,21 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse create(CreateUserRequest user) {
-        if(userRepository.existsByUsername(user.username())){
-            String message = String.format("User with username %s is already exists",user.username());
-            throw new RecordAlreadyExistException(message);
-        }
-        if(userRepository.existsByEmail(user.email())){
+        try{
+            if(userRepository.existsByUsername(user.username())){
+                String message = String.format("User with username %s is already exists",user.username());
+                throw new RecordAlreadyExistException(message);
+            }
+            if(userRepository.existsByEmail(user.email())){
+                String message = String.format("User with email %s is already exists",user.email());
+                throw new RecordAlreadyExistException(message);
+            }
+            return mapper.toResponse(userRepository.saveAndFlush(mapper.toEntity(user)));
+        }catch (DataIntegrityViolationException ex){
             String message = String.format("User with email %s is already exists",user.email());
             throw new RecordAlreadyExistException(message);
         }
-        return mapper.toResponse(userRepository.save(mapper.toEntity(user)));
+
     }
 
     @Override
@@ -51,9 +58,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse update(UUID id, CreateUserRequest user) {
-        User existingUser = mapper.toEntity(getById(id));
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("User not found with id: " + id));
         mapper.updateEntityFromRequest(user, existingUser);
-        return mapper.toResponse(userRepository.save(existingUser));
+        return mapper.toResponse(userRepository.saveAndFlush(existingUser));
     }
 
     @Override
