@@ -21,9 +21,11 @@ public class User extends BaseEntity {
     private UUID customerId;
 
     @Length(max = 100)
+    @Column(unique = true)
     private String username;
 
     @Email
+    @Column(unique = true)
     private String email;
 
     @Length(max = 150)

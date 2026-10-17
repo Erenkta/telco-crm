@@ -3,16 +3,14 @@ package com.bootcamp.identity_service.service.impl;
 import com.bootcamp.identity_service.dto.request.CreatePermissionRequest;
 import com.bootcamp.identity_service.dto.response.PermissionResponse;
 import com.bootcamp.identity_service.entity.Permission;
+import com.bootcamp.identity_service.exception.RecordNotFoundException;
 import com.bootcamp.identity_service.mapper.PermissionMapper;
 import com.bootcamp.identity_service.repository.PermissionRepository;
 import com.bootcamp.identity_service.service.PermissionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -34,8 +32,7 @@ public class PermissionServiceImpl implements PermissionService {
     public PermissionResponse getById(UUID id) {
         return permissionRepository.findById(id)
                 .map(mapper::toResponse)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Permission not found with id: " + id));
+                .orElseThrow(() -> new RecordNotFoundException("Permission not found with id: " + id));
     }
 
     @Override
@@ -55,8 +52,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Transactional
     public void delete(UUID id) {
         if (!permissionRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Permission not found with id: " + id);
+            throw new RecordNotFoundException("Permission not found with id: " + id);
         }
         permissionRepository.deleteById(id);
     }
