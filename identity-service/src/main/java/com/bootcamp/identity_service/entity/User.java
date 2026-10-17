@@ -5,8 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
-import org.springframework.data.annotation.Version;
-
+import jakarta.persistence.Version;
 import java.util.UUID;
 
 @Table(name = "users")
@@ -21,9 +20,11 @@ public class User extends BaseEntity {
     private UUID customerId;
 
     @Length(max = 100)
+    @Column(unique = true)
     private String username;
 
     @Email
+    @Column(unique = true)
     private String email;
 
     @Length(max = 150)
@@ -33,7 +34,8 @@ public class User extends BaseEntity {
     private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
-    private StatusEnum status;
+    @Builder.Default
+    private StatusEnum status = StatusEnum.ACTIVE;
 
     @Column(name = "keycloak_user_id",nullable = false,unique = true)
     private String keycloakUserId;

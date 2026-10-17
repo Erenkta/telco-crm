@@ -1,12 +1,12 @@
 package com.bootcamp.identity_service.entity;
 
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -17,16 +17,14 @@ import java.util.UUID;
 @Getter
 @Setter
 @ToString
-@EntityListeners(AuditingEntityListener.class)
 @RequiredArgsConstructor
 public abstract class BaseEntity {
 
     @Id
+    @GeneratedValue
     private UUID id;
-
-    @CreatedDate
+    @CreationTimestamp
     private OffsetDateTime createdAt;
-    @LastModifiedDate
+    @UpdateTimestamp
     private OffsetDateTime updatedAt;
-
 }
