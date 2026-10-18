@@ -2,7 +2,9 @@ package com.bootcamp.identity_service.controller;
 
 import com.bootcamp.identity_service.dto.request.AssignRoleRequest;
 import com.bootcamp.identity_service.dto.request.CreateUserRequest;
+import com.bootcamp.identity_service.dto.request.UpdateStatusRequest;
 import com.bootcamp.identity_service.dto.response.UserResponse;
+import com.bootcamp.identity_service.entity.enums.StatusEnum;
 import com.bootcamp.identity_service.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -42,12 +44,6 @@ public class UserController {
         return ResponseEntity.ok(userService.update(id, user));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        userService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
-
     @PostMapping("/{id}/roles")
     public ResponseEntity<UserResponse> assignRoles(@Valid @RequestBody AssignRoleRequest request, @PathVariable UUID id){
         return ResponseEntity.ok(userService.assignRoles(request.roles(),id));
@@ -58,6 +54,10 @@ public class UserController {
         userService.removeRoles(roleId,id);
         return ResponseEntity.noContent().build();
 
+    }
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<UserResponse> updateStatus(@RequestBody @Valid UpdateStatusRequest request, @PathVariable UUID id){
+        return ResponseEntity.ok(userService.updateStatus(id,request.status()));
     }
 
 }

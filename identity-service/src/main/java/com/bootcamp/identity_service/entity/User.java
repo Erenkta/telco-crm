@@ -35,6 +35,7 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
+    @Setter(AccessLevel.NONE)
     private StatusEnum status = StatusEnum.ACTIVE;
 
     @Column(name = "keycloak_user_id",nullable = false,unique = true)
@@ -42,5 +43,13 @@ public class User extends BaseEntity {
 
     @Version
     private Long version;
+
+    public void changeStatus(StatusEnum status){
+        this.status = this.status.transitionTo(status);
+    }
+
+    public boolean isModifiable(){
+        return this.status != StatusEnum.DELETED && this.status != StatusEnum.BLOCKED;
+    }
 
 }
