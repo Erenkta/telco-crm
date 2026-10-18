@@ -13,7 +13,6 @@ public interface PermissionMapper {
 
     PermissionResponse toResponse(Permission permission); // Read
     Permission toEntity(CreatePermissionRequest request); // Create
-    Permission toEntity(PermissionResponse request); // Create
 
     void updateEntityFromRequest(CreatePermissionRequest request, @MappingTarget Permission permission); // Update
 }

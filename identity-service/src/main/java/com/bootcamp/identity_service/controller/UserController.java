@@ -1,8 +1,8 @@
 package com.bootcamp.identity_service.controller;
 
+import com.bootcamp.identity_service.dto.request.AssignRoleRequest;
 import com.bootcamp.identity_service.dto.request.CreateUserRequest;
 import com.bootcamp.identity_service.dto.response.UserResponse;
-import com.bootcamp.identity_service.entity.User;
 import com.bootcamp.identity_service.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -47,4 +47,17 @@ public class UserController {
         userService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{id}/roles")
+    public ResponseEntity<UserResponse> assignRoles(@Valid @RequestBody AssignRoleRequest request, @PathVariable UUID id){
+        return ResponseEntity.ok(userService.assignRoles(request.roles(),id));
+    }
+
+    @DeleteMapping("/{id}/roles/{roleId}")
+    public ResponseEntity<Void> removeRoles(@PathVariable UUID roleId, @PathVariable UUID id){
+        userService.removeRoles(roleId,id);
+        return ResponseEntity.noContent().build();
+
+    }
+
 }

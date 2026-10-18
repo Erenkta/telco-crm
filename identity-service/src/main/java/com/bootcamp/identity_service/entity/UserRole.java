@@ -2,6 +2,7 @@ package com.bootcamp.identity_service.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -21,6 +22,7 @@ import java.util.UUID;
 public class UserRole {
 
     @Id
+    @GeneratedValue
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,7 +35,8 @@ public class UserRole {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Role role;
 
-    private OffsetDateTime assigned_at;
+    @CreationTimestamp
+    private OffsetDateTime assignedAt;
     private String assignedBy;
 
 }

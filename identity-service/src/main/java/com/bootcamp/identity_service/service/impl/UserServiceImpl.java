@@ -6,13 +6,17 @@ import com.bootcamp.identity_service.entity.User;
 import com.bootcamp.identity_service.exception.RecordAlreadyExistException;
 import com.bootcamp.identity_service.exception.RecordNotFoundException;
 import com.bootcamp.identity_service.mapper.UserMapper;
+import com.bootcamp.identity_service.repository.RoleRepository;
 import com.bootcamp.identity_service.repository.UserRepository;
+import com.bootcamp.identity_service.repository.UserRoleRepository;
 import com.bootcamp.identity_service.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -20,7 +24,10 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final RoleRepository roleRepository;
     private final UserMapper mapper;
+    private static final String SYSTEM_USER = "system";
 
     @Override
     @Transactional
@@ -38,9 +45,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getById(UUID id) {
-        return userRepository.findById(id)
-                .map(mapper::toResponse)
-                .orElseThrow(() -> new RecordNotFoundException("User not found with id: " + id));
+        User user = findByIdOrThrowEx(id);
+        return mapper.toResponse(user, userRoleRepository.findRoleNamesByUserId(id));
     }
 
     @Override
@@ -51,8 +57,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse update(UUID id, CreateUserRequest user) {
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("User not found with id: " + id));
+        User existingUser = findByIdOrThrowEx(id);
         mapper.updateEntityFromRequest(user, existingUser);
         return mapper.toResponse(userRepository.saveAndFlush(existingUser));
     }
@@ -60,9 +65,40 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void delete(UUID id) {
+        checkByIdOrThrowEx(id);
+        userRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public UserResponse assignRoles(List<UUID> roleIds, UUID userId) {
+        User existingUser = findByIdOrThrowEx(userId);
+        Set<UUID> requested = new HashSet<>(roleIds);
+
+        // Fetch the existing role ids. Some of the requested ids might not be existed.
+        Set<UUID> existing = roleRepository.findExistingIds(requested);
+        if (existing.size() != requested.size()) {
+            requested.removeAll(existing);
+            throw new RecordNotFoundException("Roles not found with ids: " + requested);
+        }
+
+        userRoleRepository.assignIfAbsent(userId, existing, SYSTEM_USER);
+        return mapper.toResponse(existingUser, userRoleRepository.findRoleNamesByUserId(userId));
+    }
+
+    @Override
+    @Transactional
+    public void removeRoles(UUID roleId, UUID userId) {
+        checkByIdOrThrowEx(userId);
+        userRoleRepository.deleteAssignment(userId, roleId);
+    }
+    private User findByIdOrThrowEx(UUID id){
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("User not found with id: " + id));
+    }
+    private void checkByIdOrThrowEx(UUID id){
         if (!userRepository.existsById(id)) {
             throw new RecordNotFoundException("User not found with id: " + id);
         }
-        userRepository.deleteById(id);
     }
 }
