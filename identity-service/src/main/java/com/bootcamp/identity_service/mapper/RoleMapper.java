@@ -12,7 +12,6 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 public interface RoleMapper {
 
     Role toEntity(CreateRoleRequest request);
-    Role toEntity(RoleResponse response);
     RoleResponse toResponse(Role role);
 
     void updateEntityFromRequest(CreateRoleRequest request,@MappingTarget Role role );
