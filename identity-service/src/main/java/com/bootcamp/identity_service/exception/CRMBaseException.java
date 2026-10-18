@@ -19,7 +19,7 @@ public class CRMBaseException extends RuntimeException {
     }
 
     public String generateExceptionTitle(){
-        return type.name() +" error occured in "+source.name();
+        return type.name() +" error occurred in "+source.name();
     }
     public String generateExceptionSummary(){
         return generateExceptionTitle()+". Exception Details: "+getMessage();
