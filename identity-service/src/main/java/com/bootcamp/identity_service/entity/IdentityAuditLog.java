@@ -18,6 +18,7 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 public class IdentityAuditLog {
     @Id
+    @GeneratedValue
     private UUID id;
 
     @Enumerated(EnumType.STRING)
