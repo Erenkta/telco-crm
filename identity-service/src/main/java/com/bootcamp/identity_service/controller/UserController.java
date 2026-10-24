@@ -3,16 +3,16 @@ package com.bootcamp.identity_service.controller;
 import com.bootcamp.identity_service.dto.request.AssignRoleRequest;
 import com.bootcamp.identity_service.dto.request.CreateUserRequest;
 import com.bootcamp.identity_service.dto.request.UpdateStatusRequest;
+import com.bootcamp.identity_service.dto.response.PageResponse;
 import com.bootcamp.identity_service.dto.response.UserResponse;
-import com.bootcamp.identity_service.entity.enums.StatusEnum;
 import com.bootcamp.identity_service.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -34,9 +34,10 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserResponse>> getAll() {
-        return ResponseEntity.ok(userService.getAll());
+    public ResponseEntity<PageResponse<UserResponse>> getAll(Pageable pageable) {
+        return ResponseEntity.ok(userService.getAll(pageable));
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> update(@PathVariable UUID id,

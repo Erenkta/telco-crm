@@ -1,6 +1,7 @@
 package com.bootcamp.identity_service.service.impl;
 
 import com.bootcamp.identity_service.dto.request.CreatePermissionRequest;
+import com.bootcamp.identity_service.dto.response.PageResponse;
 import com.bootcamp.identity_service.dto.response.PermissionResponse;
 import com.bootcamp.identity_service.entity.Permission;
 import com.bootcamp.identity_service.exception.RecordAlreadyExistException;
@@ -11,9 +12,9 @@ import com.bootcamp.identity_service.repository.PermissionRepository;
 import com.bootcamp.identity_service.service.PermissionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -42,8 +43,8 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public List<PermissionResponse> getAll() {
-        return permissionRepository.findAll().stream().map(mapper::toResponse).toList();
+    public PageResponse<PermissionResponse> getAll(Pageable pageable) {
+        return new PageResponse<>(permissionRepository.findAll(pageable).map(mapper::toResponse));
     }
 
     @Override

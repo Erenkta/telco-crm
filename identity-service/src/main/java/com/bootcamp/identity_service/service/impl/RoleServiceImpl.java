@@ -1,6 +1,7 @@
 package com.bootcamp.identity_service.service.impl;
 
 import com.bootcamp.identity_service.dto.request.CreateRoleRequest;
+import com.bootcamp.identity_service.dto.response.PageResponse;
 import com.bootcamp.identity_service.dto.response.RoleResponse;
 import com.bootcamp.identity_service.entity.Role;
 import com.bootcamp.identity_service.exception.RecordAlreadyExistException;
@@ -10,10 +11,10 @@ import com.bootcamp.identity_service.mapper.RoleMapper;
 import com.bootcamp.identity_service.repository.RoleRepository;
 import com.bootcamp.identity_service.service.RoleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -41,8 +42,8 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<RoleResponse> getAll() {
-        return roleRepository.findAll().stream().map(mapper::toResponse).toList();
+    public PageResponse<RoleResponse> getAll(Pageable pageable) {
+        return new PageResponse<>(roleRepository.findAll(pageable).map(mapper::toResponse));
     }
 
     @Override

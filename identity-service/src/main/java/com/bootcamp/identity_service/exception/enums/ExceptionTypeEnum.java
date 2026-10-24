@@ -8,6 +8,7 @@ public enum ExceptionTypeEnum {
     IO,
     TIMEOUT,
     INVALID_STATE_TRANSITION,
+    BAD_PAGE_PARAMETER,
     NOT_AVAILABLE,
     UNKNOWN
 }
