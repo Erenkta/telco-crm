@@ -1,6 +1,5 @@
 package com.bootcamp.identity_service.exception;
 
-import com.bootcamp.identity_service.exception.enums.ExceptionTypeEnum;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;

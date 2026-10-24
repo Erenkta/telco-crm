@@ -1,6 +1,7 @@
 package com.bootcamp.identity_service.service.impl;
 
 import com.bootcamp.identity_service.dto.request.CreateUserRequest;
+import com.bootcamp.identity_service.dto.response.PageResponse;
 import com.bootcamp.identity_service.dto.response.UserResponse;
 import com.bootcamp.identity_service.entity.User;
 import com.bootcamp.identity_service.entity.enums.StatusEnum;
@@ -13,6 +14,7 @@ import com.bootcamp.identity_service.repository.UserRepository;
 import com.bootcamp.identity_service.repository.UserRoleRepository;
 import com.bootcamp.identity_service.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,8 +56,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserResponse> getAll() {
-        return userRepository.findAllByStatusNot(StatusEnum.DELETED).stream().map(mapper::toResponse).toList();
+    public PageResponse<UserResponse> getAll(Pageable pageable) {
+        return new PageResponse<>(userRepository.findAllByStatusNot(StatusEnum.DELETED,pageable).map(mapper::toResponse));
     }
 
     @Override

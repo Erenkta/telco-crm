@@ -2,15 +2,16 @@ package com.bootcamp.identity_service.controller;
 
 
 import com.bootcamp.identity_service.dto.request.CreatePermissionRequest;
+import com.bootcamp.identity_service.dto.response.PageResponse;
 import com.bootcamp.identity_service.dto.response.PermissionResponse;
 import com.bootcamp.identity_service.service.PermissionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -32,8 +33,8 @@ public class PermissionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PermissionResponse>> getAll() {
-        return ResponseEntity.ok(permissionService.getAll());
+    public ResponseEntity<PageResponse<PermissionResponse>> getAll(Pageable pageable) {
+        return ResponseEntity.ok(permissionService.getAll(pageable));
     }
 
     @PutMapping("/{id}")

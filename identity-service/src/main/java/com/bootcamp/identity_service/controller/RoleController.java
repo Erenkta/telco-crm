@@ -1,16 +1,16 @@
 package com.bootcamp.identity_service.controller;
 
 import com.bootcamp.identity_service.dto.request.CreateRoleRequest;
+import com.bootcamp.identity_service.dto.response.PageResponse;
 import com.bootcamp.identity_service.dto.response.RoleResponse;
-import com.bootcamp.identity_service.entity.Role;
 import com.bootcamp.identity_service.service.RoleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -32,8 +32,8 @@ public class RoleController {
     }
 
     @GetMapping
-    public ResponseEntity<List<RoleResponse>> getAll() {
-        return ResponseEntity.ok(roleService.getAll());
+    public ResponseEntity<PageResponse<RoleResponse>> getAll(Pageable pageable) {
+        return ResponseEntity.ok(roleService.getAll(pageable));
     }
 
     @PutMapping("/{id}")
