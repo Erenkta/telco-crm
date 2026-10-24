@@ -1,10 +1,13 @@
 package com.bootcamp.identity_service.service.impl;
 
+import com.bootcamp.identity_service.config.CurrentActorProvider;
 import com.bootcamp.identity_service.dto.request.CreateUserRequest;
 import com.bootcamp.identity_service.dto.response.PageResponse;
 import com.bootcamp.identity_service.dto.response.UserResponse;
 import com.bootcamp.identity_service.entity.User;
 import com.bootcamp.identity_service.entity.enums.StatusEnum;
+import com.bootcamp.identity_service.event.AuditEvent;
+import com.bootcamp.identity_service.event.user.*;
 import com.bootcamp.identity_service.exception.RecordAlreadyExistException;
 import com.bootcamp.identity_service.exception.RecordNotAvailableException;
 import com.bootcamp.identity_service.exception.RecordNotFoundException;
@@ -14,6 +17,7 @@ import com.bootcamp.identity_service.repository.UserRepository;
 import com.bootcamp.identity_service.repository.UserRoleRepository;
 import com.bootcamp.identity_service.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,12 +30,12 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
+    private final ApplicationEventPublisher eventPublisher;
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final RoleRepository roleRepository;
     private final UserMapper mapper;
-    private static final String SYSTEM_USER = "system";
+    private final CurrentActorProvider actorProvider;
 
     @Override
     @Transactional
@@ -44,7 +48,9 @@ public class UserServiceImpl implements UserService {
             String message = String.format("User with email %s already exists",user.email());
             throw new RecordAlreadyExistException(message);
         }
-        return mapper.toResponse(userRepository.saveAndFlush(mapper.toEntity(user)));
+        UserResponse response = mapper.toResponse(userRepository.saveAndFlush(mapper.toEntity(user)));
+        eventPublisher.publishEvent(UserCreatedEvent.build(response.id()));
+        return response;
     }
 
     @Override
@@ -66,15 +72,24 @@ public class UserServiceImpl implements UserService {
         User existingUser = findByIdOrThrowEx(id);
         throwIfNotModifiable(existingUser, "update");
         mapper.updateEntityFromRequest(user, existingUser);
-        return mapper.toResponse(userRepository.saveAndFlush(existingUser));
+        UserResponse response =  mapper.toResponse(userRepository.saveAndFlush(existingUser));
+        eventPublisher.publishEvent(UserModifiedEvent.build(id));
+        return response;
     }
 
     @Override
     @Transactional
     public UserResponse updateStatus(UUID id, StatusEnum status) {
         User user = findByIdOrThrowEx(id);
+        boolean isSameStatus = status == user.getStatus();
+        if(isSameStatus){
+            return mapper.toResponse(user);
+        }
         user.changeStatus(status);
-        return mapper.toResponse(userRepository.saveAndFlush(user),userRoleRepository.findRoleNamesByUserId(id));
+        UserResponse response = mapper.toResponse(userRepository.saveAndFlush(user),userRoleRepository.findRoleNamesByUserId(id));
+        eventPublisher.publishEvent(UserStatusChangedEvent.build(String.format("User Status updated to %s.",status),id));
+
+        return response;
     }
 
 
@@ -92,8 +107,14 @@ public class UserServiceImpl implements UserService {
             throw new RecordNotFoundException("Roles not found with ids: " + requested);
         }
 
-        userRoleRepository.assignIfAbsent(userId, existing, SYSTEM_USER);
-        return mapper.toResponse(existingUser, userRoleRepository.findRoleNamesByUserId(userId));
+        int assignedRoleCount = userRoleRepository.assignIfAbsent(userId, existing, actorProvider.currentActor());
+        UserResponse response = mapper.toResponse(userRepository.save(existingUser), userRoleRepository.findRoleNamesByUserId(userId));
+
+        if(assignedRoleCount >0){
+            eventPublisher.publishEvent(UserRoleAssignedEvent.build(roleIds,userId));
+        }
+
+        return response;
     }
 
     @Override
@@ -101,7 +122,11 @@ public class UserServiceImpl implements UserService {
     public void removeRoles(UUID roleId, UUID userId) {
         User user = findByIdOrThrowEx(userId);
         throwIfNotModifiable(user, "remove roles from");
-        userRoleRepository.deleteAssignment(userId, roleId);
+       int deletedRoleCount =  userRoleRepository.deleteAssignment(userId, roleId);
+
+        if(deletedRoleCount >0){
+            eventPublisher.publishEvent(UserRoleRemovedEvent.build(roleId,userId));
+        }
     }
 
     private void throwIfNotModifiable(User user, String action) {

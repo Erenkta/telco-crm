@@ -4,6 +4,9 @@ import com.bootcamp.identity_service.dto.request.CreateRoleRequest;
 import com.bootcamp.identity_service.dto.response.PageResponse;
 import com.bootcamp.identity_service.dto.response.RoleResponse;
 import com.bootcamp.identity_service.entity.Role;
+import com.bootcamp.identity_service.event.role.RoleCreatedEvent;
+import com.bootcamp.identity_service.event.role.RoleDeletedEvent;
+import com.bootcamp.identity_service.event.role.RoleModifiedEvent;
 import com.bootcamp.identity_service.exception.RecordAlreadyExistException;
 import com.bootcamp.identity_service.exception.RecordNotFoundException;
 import com.bootcamp.identity_service.exception.enums.ModuleEnum;
@@ -11,6 +14,7 @@ import com.bootcamp.identity_service.mapper.RoleMapper;
 import com.bootcamp.identity_service.repository.RoleRepository;
 import com.bootcamp.identity_service.service.RoleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +27,7 @@ public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
     private final RoleMapper mapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -31,7 +36,9 @@ public class RoleServiceImpl implements RoleService {
             String message = String.format("Role with name %s already exists",role.name());
             throw new RecordAlreadyExistException(message, ModuleEnum.IDENTITY_SERVICE);
         }
-        return mapper.toResponse(roleRepository.saveAndFlush(mapper.toEntity(role)));
+        RoleResponse response = mapper.toResponse(roleRepository.saveAndFlush(mapper.toEntity(role)));
+        eventPublisher.publishEvent(RoleCreatedEvent.build(response.id()));
+        return response;
     }
 
     @Override
@@ -52,7 +59,10 @@ public class RoleServiceImpl implements RoleService {
         Role existingRole = roleRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException("Role not found with id: " + id));
         mapper.updateEntityFromRequest(role,existingRole);
-        return mapper.toResponse(roleRepository.saveAndFlush(existingRole));
+        RoleResponse response = mapper.toResponse(roleRepository.saveAndFlush(existingRole));
+        eventPublisher.publishEvent(RoleModifiedEvent.build(id));
+
+        return response;
     }
 
     @Override
@@ -62,5 +72,6 @@ public class RoleServiceImpl implements RoleService {
             throw new RecordNotFoundException("Role not found with id: " + id);
         }
         roleRepository.deleteById(id);
+        eventPublisher.publishEvent(RoleDeletedEvent.build(id));
     }
 }
