@@ -71,9 +71,12 @@ services:
       ports:
         - "8888:8888"
       environment:
-        - SPRING_PROFILES_ACTIVE=git
+        SPRING_PROFILES_ACTIVE: native
+        CONFIG_FILE_LOCATIONS: /config-files
       networks:
         - backend-network
+      volumes:
+        - ./config-files:/config-files:ro
       healthcheck:
         test: ["CMD","curl","-f","http://localhost:8888/actuator/health"]
         interval: 10s
@@ -82,29 +85,29 @@ services:
         start_period: 15s
       restart: always
 
-  naming-server:
-    build:
-      context: .
-      dockerfile: ./naming-server/Dockerfile
-    container_name: naming-server
-    ports:
-      - "8761:8761"
-    environment:
-      - SPRING_PROFILES_ACTIVE=dev
-      - EUREKA_INSTANCE_HOSTNAME=naming-server
-      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
-    depends_on:
-      config-server:
-        condition: service_healthy
-    networks:
-      - backend-network
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 15s
-    restart: always
+ #naming-server:
+ #  build:
+ #    context: .
+ #    dockerfile: ./naming-server/Dockerfile
+ #  container_name: naming-server
+ #  ports:
+ #    - "8761:8761"
+ #  environment:
+ #    - SPRING_PROFILES_ACTIVE=dev
+ #    - EUREKA_INSTANCE_HOSTNAME=naming-server
+ #    - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+ #  depends_on:
+ #    config-server:
+ #      condition: service_healthy
+ #  networks:
+ #    - backend-network
+ #  healthcheck:
+ #    test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+ #    interval: 10s
+ #    timeout: 5s
+ #    retries: 5
+ #    start_period: 15s
+ #  restart: always
 
 volumes:
   postgres_data:
