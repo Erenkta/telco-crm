@@ -8,6 +8,7 @@ COPY pom.xml .
 # 2. Maven Reactor'ın patlamaması için diğer alt modüllerin SADECE pom.xml'lerini kopyala
 COPY gateway/pom.xml ./gateway/
 COPY naming-server/pom.xml ./naming-server/
+COPY identity-serviceas/pom.xml ./identity-service/
 
 # 3. Config Server'ın hem pom.xml hem de kaynak kodlarını kopyala
 COPY config-server/pom.xml ./config-server/
