@@ -8,6 +8,8 @@ import com.bootcamp.identity_service.entity.enums.StatusEnum;
 import com.bootcamp.identity_service.event.user.UserCreatedEvent;
 import com.bootcamp.identity_service.event.user.UserRoleAssignedEvent;
 import com.bootcamp.identity_service.event.user.UserRoleRemovedEvent;
+import com.bootcamp.identity_service.event.user.UserStatusChangedEvent;
+import com.bootcamp.identity_service.exception.InvalidStatusTransitionException;
 import com.bootcamp.identity_service.exception.RecordAlreadyExistException;
 import com.bootcamp.identity_service.exception.RecordNotAvailableException;
 import com.bootcamp.identity_service.exception.RecordNotFoundException;
@@ -30,9 +32,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 // Quick Learn :
 // ExtendWithMocks connect Mockito and JUnit
@@ -113,7 +113,7 @@ class UserServiceImplTest {
         verify(userRepository, never()).saveAndFlush(any());
         verify(eventPublisher,never()).publishEvent(any(Object.class));
     }
-    
+
     @Test
     void assignRoles_throwsNotAvailable_whenUserIsBlocked() {
         // Arrange
@@ -237,5 +237,59 @@ class UserServiceImplTest {
         userService.removeRoles(roleId, userId);
 
         verify(eventPublisher,never()).publishEvent(any(UserRoleRemovedEvent.class));
+    }
+
+    @Test
+    void updateStatus_throwsRecordNotFound_whenUserNotExist(){
+        UUID userId = UUID.randomUUID();
+
+        when(userRepository.findByIdAndStatusNot(userId,StatusEnum.DELETED)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(()-> userService.updateStatus(userId,StatusEnum.INACTIVE))
+                .isInstanceOf(RecordNotFoundException.class)
+                .hasMessageContaining(userId.toString());
+
+        verify(userRepository,never()).saveAndFlush(any(User.class));
+        verify(eventPublisher,never()).publishEvent(any(Object.class));
+    }
+
+    @Test
+    void updateStatus_doesNotSave_whenStatusIsSame(){
+        UUID userId = UUID.randomUUID();
+        User user = User.builder().status(StatusEnum.ACTIVE).build();
+
+        when(userRepository.findByIdAndStatusNot(userId,StatusEnum.DELETED)).thenReturn(Optional.of(user));
+
+        userService.updateStatus(userId,StatusEnum.ACTIVE);
+
+        verify(userRepository,never()).saveAndFlush(any(User.class));
+        verify(eventPublisher,never()).publishEvent(any(Object.class));
+    }
+
+    @Test
+    void updateStatus_throwsInvalidStatusTransitionException_whenStatusTransitionIsInvalid(){
+        UUID userId = UUID.randomUUID();
+        User user = User.builder().status(StatusEnum.BLOCKED).build();
+        when(userRepository.findByIdAndStatusNot(userId,StatusEnum.DELETED)).thenReturn(Optional.of(user));
+
+        assertThatThrownBy(()-> userService.updateStatus(userId,StatusEnum.INACTIVE))
+                .isInstanceOf(InvalidStatusTransitionException.class);
+
+        verify(userRepository,never()).saveAndFlush(any(User.class));
+        verify(eventPublisher,never()).publishEvent(any(Object.class));
+    }
+
+    @Test
+    void updateStatus_savesAndPublishesEvent_whenStatusTransitionIsValid(){
+        UUID userId = UUID.randomUUID();
+        User user = User.builder().status(StatusEnum.ACTIVE).build();
+
+        when(userRepository.findByIdAndStatusNot(userId,StatusEnum.DELETED)).thenReturn(Optional.of(user));
+
+        userService.updateStatus(userId,StatusEnum.INACTIVE);
+
+        assertThat(user.getStatus()).isEqualTo(StatusEnum.INACTIVE);
+        verify(userRepository).saveAndFlush(user);
+        verify(eventPublisher).publishEvent(any(UserStatusChangedEvent.class));
     }
 }
