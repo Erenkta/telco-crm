@@ -19,7 +19,8 @@ class StatusEnumTest {
             "INACTIVE, ACTIVE",
             "INACTIVE, DELETED",
             "INACTIVE, BLOCKED",
-            "BLOCKED,  ACTIVE"
+            "BLOCKED,  ACTIVE",
+            "DELETED,  ACTIVE"
     })
     void transitionTo_returnsTarget_whenTransitionIsAllowed(StatusEnum from, StatusEnum to) {
         assertThat(from.transitionTo(to)).isEqualTo(to);
