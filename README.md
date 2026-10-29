@@ -1,3 +1,5 @@
+[![CI](https://github.com/Erenkta/telco-crm/actions/workflows/ci.yml/badge.svg)](https://github.com/Erenkta/telco-crm/actions/workflows/ci.yml)
+
 ## 📌 About The Project
 
 This project is a practical backend development initiative adapted from a **Turkcell Future Writers (Geleceği Yazanlar) Bootcamp** curriculum and refined with AI-driven insights to accelerate my growth as a backend engineer.
