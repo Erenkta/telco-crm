@@ -1,4 +1,4 @@
-package com.bootcamp.identity_service.exception.enums;
+package com.bootcamp.common.exception.enums;
 
 public enum ExceptionTypeEnum {
     VALIDATION,

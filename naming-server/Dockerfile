@@ -8,6 +8,7 @@ COPY pom.xml .
 # 2. Maven Reactor doğrulamasını geçmek için diğer modüllerin SADECE pom.xml'lerini kopyala
 COPY config-server/pom.xml ./config-server/
 COPY gateway/pom.xml ./gateway/
+COPY identity-service/pom.xml ./identity-service/
 
 # 3. Naming Server'ın hem pom.xml hem de kaynak kodlarını kopyala
 COPY naming-server/pom.xml ./naming-server/

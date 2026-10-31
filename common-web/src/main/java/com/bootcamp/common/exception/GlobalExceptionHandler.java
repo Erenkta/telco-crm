@@ -1,7 +1,9 @@
-package com.bootcamp.identity_service.exception;
+package com.bootcamp.common.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.*;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -25,20 +27,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final String UNIQUE_VIOLATION = "23505";
 
-    // Postgres'in varsayılan unique constraint isimleri (V1__init.sql)
-    private static final Map<String, String> UNIQUE_CONSTRAINT_MESSAGES = Map.of(
-            "users_email_key", "Email is already in use",
-            "users_username_key", "Username is already in use",
-            "roles_name_key", "Role name is already in use",
-            "permissions_name_key", "Permission name is already in use",
-            "uk_user_role", "Role is already assigned to the user"
-    );
+  private final Map<String,String> uniqueConstraintMessages;
+
+  private final String serviceName;
+
+  public GlobalExceptionHandler(ObjectProvider<UniqueConstraintMessages> provider, @Value("${spring.application.name}") String serviceName) {
+      this.uniqueConstraintMessages = provider.getIfAvailable(()-> Map::of).messages();
+      this.serviceName = serviceName;
+  }
 
     @ExceptionHandler(CRMBaseException.class)
     public ProblemDetail handleCrmException(CRMBaseException ex, HttpServletRequest request) {
-        ProblemDetail response = ProblemDetail.forStatusAndDetail(ex.getStatusCode(),ex.generateExceptionSummary());
+        ProblemDetail response = ProblemDetail.forStatus(ex.getStatusCode());
 
-        response.setTitle(ex.generateExceptionTitle());
+        String title = ex.getType().name() + " error occurred in " + serviceName;
+        response.setTitle(title);
+        response.setDetail(title + ". Exception Details: " + ex.getMessage());
         response.setInstance(URI.create(request.getRequestURI()));
         response.setProperty("timestamp", Instant.now());
         response.setProperty("trace","");
@@ -60,7 +64,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ProblemDetail handleDataIntegrity(DataIntegrityViolationException ex, HttpServletRequest request) {
         if (ex.getMostSpecificCause() instanceof SQLException sql && UNIQUE_VIOLATION.equals(sql.getSQLState())) {
-            String detail = UNIQUE_CONSTRAINT_MESSAGES.entrySet().stream()
+            String detail = uniqueConstraintMessages.entrySet().stream()
                     .filter(e -> sql.getMessage().contains(e.getKey()))
                     .map(Map.Entry::getValue)
                     .findFirst()

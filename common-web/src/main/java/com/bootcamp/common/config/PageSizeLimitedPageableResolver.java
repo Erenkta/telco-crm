@@ -1,7 +1,7 @@
-package com.bootcamp.identity_service.config;
+package com.bootcamp.common.config;
 
-import com.bootcamp.identity_service.exception.InvalidPageSizeException;
-import com.bootcamp.identity_service.exception.InvalidPageSortException;
+import com.bootcamp.common.exception.InvalidPageSizeException;
+import com.bootcamp.common.exception.InvalidPageSortException;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,12 +17,13 @@ import java.util.List;
 // Each resolver is handle a specific type of an argument.
 public class PageSizeLimitedPageableResolver extends PageableHandlerMethodArgumentResolver {
     private final int maxPageSize;
-    private final List<String> sortWhiteList = List.of("createdAt","updatedAt");
+    private final List<String> sortWhitelist;
 
-    public PageSizeLimitedPageableResolver(int defaultPageSize,int maxPageSize,Sort sortByDefault){
+    public PageSizeLimitedPageableResolver(int defaultPageSize,int maxPageSize,Sort sortByDefault,List<String> sortWhitelist){
         this.maxPageSize = maxPageSize;
         this.setMaxPageSize(Integer.MAX_VALUE); // To disable the behavior of Parent class.
         setFallbackPageable(PageRequest.of(0,defaultPageSize, sortByDefault)); // if page and size are never sent as params.
+        this.sortWhitelist = sortWhitelist;
     }
 
     @Override
@@ -34,7 +35,7 @@ public class PageSizeLimitedPageableResolver extends PageableHandlerMethodArgume
 
         pageable.getSort().stream().forEach(item -> { // To check if sort parameter is valid
             String sortProperty = item.getProperty();
-            if(!sortWhiteList.contains(sortProperty)){
+            if(!sortWhitelist.contains(sortProperty)){
                 String message = String.format("%s is not a valid sort parameter.",sortProperty);
                 throw new InvalidPageSortException(message);
             }

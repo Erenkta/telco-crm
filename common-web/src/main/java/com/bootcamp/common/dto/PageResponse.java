@@ -1,4 +1,4 @@
-package com.bootcamp.identity_service.dto.response;
+package com.bootcamp.common.dto;
 
 import org.springframework.data.domain.Page;
 

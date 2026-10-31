@@ -1,5 +1,7 @@
 package com.bootcamp.identity_service.entity;
 
+import com.bootcamp.common.entity.BaseEntity;
+
 import com.bootcamp.identity_service.entity.enums.StatusEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;

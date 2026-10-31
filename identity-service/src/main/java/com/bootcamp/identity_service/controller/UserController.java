@@ -3,7 +3,7 @@ package com.bootcamp.identity_service.controller;
 import com.bootcamp.identity_service.dto.request.AssignRoleRequest;
 import com.bootcamp.identity_service.dto.request.CreateUserRequest;
 import com.bootcamp.identity_service.dto.request.UpdateStatusRequest;
-import com.bootcamp.identity_service.dto.response.PageResponse;
+import com.bootcamp.common.dto.PageResponse;
 import com.bootcamp.identity_service.dto.response.UserResponse;
 import com.bootcamp.identity_service.service.UserService;
 import jakarta.validation.Valid;

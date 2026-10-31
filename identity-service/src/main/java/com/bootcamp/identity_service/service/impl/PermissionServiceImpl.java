@@ -1,12 +1,11 @@
 package com.bootcamp.identity_service.service.impl;
 
 import com.bootcamp.identity_service.dto.request.CreatePermissionRequest;
-import com.bootcamp.identity_service.dto.response.PageResponse;
+import com.bootcamp.common.dto.PageResponse;
 import com.bootcamp.identity_service.dto.response.PermissionResponse;
 import com.bootcamp.identity_service.entity.Permission;
-import com.bootcamp.identity_service.exception.RecordAlreadyExistException;
-import com.bootcamp.identity_service.exception.RecordNotFoundException;
-import com.bootcamp.identity_service.exception.enums.ModuleEnum;
+import com.bootcamp.common.exception.RecordAlreadyExistException;
+import com.bootcamp.common.exception.RecordNotFoundException;
 import com.bootcamp.identity_service.mapper.PermissionMapper;
 import com.bootcamp.identity_service.repository.PermissionRepository;
 import com.bootcamp.identity_service.service.PermissionService;
@@ -30,7 +29,7 @@ public class PermissionServiceImpl implements PermissionService {
     public PermissionResponse create(CreatePermissionRequest permission) {
         if(permissionRepository.existsByName(permission.name())){
             String message = String.format("Permission with name %s already exists",permission.name());
-            throw new RecordAlreadyExistException(message, ModuleEnum.IDENTITY_SERVICE);
+            throw new RecordAlreadyExistException(message);
         }
         return mapper.toResponse(permissionRepository.saveAndFlush(mapper.toEntity(permission)));
     }

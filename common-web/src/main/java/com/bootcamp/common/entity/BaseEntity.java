@@ -1,4 +1,4 @@
-package com.bootcamp.identity_service.entity;
+package com.bootcamp.common.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
