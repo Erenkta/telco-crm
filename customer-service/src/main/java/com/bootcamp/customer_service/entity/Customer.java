@@ -105,7 +105,7 @@ public abstract class Customer extends BaseEntity {
 
     public void removeAddress(UUID addressId) {
         Address address = addresses.stream()
-                .filter(a -> a.getId().equals(addressId))
+                .filter(a -> addressId.equals(a.getId())) // new, unflushed addresses have no id yet
                 .findFirst()
                 .orElseThrow(() -> new RecordNotFoundException(
                         String.format("Address %s not found for customer %s", addressId, getId())));

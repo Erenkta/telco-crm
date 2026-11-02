@@ -22,11 +22,9 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID>, JpaSp
     // Adding/removing an address or document does not touch the customers row, so @Version would not move.
     // OPTIMISTIC_FORCE_INCREMENT bumps the customer's version at commit anyway: child changes count as a change
     // of the customer (ETag changes, concurrent child changes conflict). Same pattern as identity's role assignment.
+    // No join fetch here: the lock mode applies to EVERY entity the query returns, and Address has no @Version
+    // ("Entity Address has no version and may not be locked"). Addresses load lazily when needed instead.
     @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
     @Query("select c from Customer c where c.id = :id")
     Optional<Customer> findByIdForUpdate(@Param("id") UUID id);
-
-    @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
-    @Query("select c from Customer c left join fetch c.addresses where c.id = :id")
-    Optional<Customer> findWithAddressesByIdForUpdate(@Param("id") UUID id);
 }

@@ -107,8 +107,7 @@ public class CustomerServiceImpl implements CustomerService {
     public void removeAddress(UUID customerId, UUID addressId) {
         // Goes through the aggregate: Customer.removeAddress only finds addresses of THIS customer (404 otherwise),
         // and orphanRemoval deletes the row when the transaction flushes.
-        Customer customer = customerRepository.findWithAddressesByIdForUpdate(customerId)
-                .orElseThrow(() -> notFound(customerId));
+        Customer customer = findForChildChangeOrThrow(customerId);
         customer.removeAddress(addressId);
     }
 
