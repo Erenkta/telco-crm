@@ -9,6 +9,8 @@ COPY pom.xml .
 COPY gateway/pom.xml ./gateway/
 COPY naming-server/pom.xml ./naming-server/
 COPY identity-service/pom.xml ./identity-service/
+COPY common-web/pom.xml ./common-web/
+COPY customer-service/pom.xml ./customer-service/
 
 # 3. Config Server'ın hem pom.xml hem de kaynak kodlarını kopyala
 COPY config-server/pom.xml ./config-server/
