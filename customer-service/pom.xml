@@ -14,12 +14,21 @@
 	<name>customer-service</name>
 	<description>Customer Service</description>
 
-	<!-- Config server + Eureka client dependencies are added with issue #30. -->
 	<dependencies>
 		<dependency>
 			<groupId>com.bootcamp</groupId>
 			<artifactId>common-web</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<!-- Versions come from the spring-cloud BOM in the parent's dependencyManagement.
+		     Not declared in the parent's <dependencies>: config-server and naming-server must not get these clients. -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
