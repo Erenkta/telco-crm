@@ -1,7 +1,7 @@
 package com.bootcamp.identity_service.controller;
 
 import com.bootcamp.identity_service.dto.request.CreateRoleRequest;
-import com.bootcamp.identity_service.dto.response.PageResponse;
+import com.bootcamp.common.dto.PageResponse;
 import com.bootcamp.identity_service.dto.response.RoleResponse;
 import com.bootcamp.identity_service.service.RoleService;
 import jakarta.validation.Valid;

@@ -5,3 +5,6 @@
 /identity-service/logs
 /.idea
 /logs
+
+# Maven build output for every module
+target/

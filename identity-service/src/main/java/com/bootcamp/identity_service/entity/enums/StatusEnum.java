@@ -1,6 +1,6 @@
 package com.bootcamp.identity_service.entity.enums;
 
-import com.bootcamp.identity_service.exception.InvalidStatusTransitionException;
+import com.bootcamp.common.exception.InvalidStatusTransitionException;
 
 import java.util.*;
 

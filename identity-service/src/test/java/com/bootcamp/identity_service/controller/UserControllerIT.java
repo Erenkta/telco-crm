@@ -52,7 +52,7 @@ class UserControllerIT {
                 .andExpect(status().isConflict())
                 .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("$.status").value(409))
-                .andExpect(jsonPath("$.title").value("CONFLICT error occurred in IDENTITY_SERVICE"))
+                .andExpect(jsonPath("$.title").value("CONFLICT error occurred in identity-service"))
                 .andExpect(jsonPath("$.detail").value(containsString(email)))
                 .andExpect(jsonPath("$.instance").value(USERS_URL))
                 .andExpect(jsonPath("$.trace").value(""));
@@ -118,6 +118,31 @@ class UserControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.roles").isEmpty());
 
+    }
+
+    // Pageable resolver comes from common-web auto-configuration; these prove it is registered and bound.
+    @Test
+    void listUsers_returns200_whenNoPageParamsAreSent() throws Exception {
+        mockMvc.perform(get(USERS_URL))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray());
+    }
+
+    @Test
+    void listUsers_returns400_whenPageSizeExceedsMax() throws Exception {
+        mockMvc.perform(get(USERS_URL).param("size", "5000"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.title").value("BAD_PAGE_PARAMETER error occurred in identity-service"))
+                .andExpect(jsonPath("$.detail").value(containsString("5000")));
+    }
+
+    @Test
+    void listUsers_returns400_whenSortFieldIsNotWhitelisted() throws Exception {
+        mockMvc.perform(get(USERS_URL).param("sort", "email"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.detail").value(containsString("email is not a valid sort parameter")));
     }
 
 

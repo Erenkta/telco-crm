@@ -1,6 +1,6 @@
 package com.bootcamp.identity_service.entity.enums;
 
-import com.bootcamp.identity_service.exception.InvalidStatusTransitionException;
+import com.bootcamp.common.exception.InvalidStatusTransitionException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;

@@ -1,15 +1,14 @@
 package com.bootcamp.identity_service.service.impl;
 
 import com.bootcamp.identity_service.dto.request.CreateRoleRequest;
-import com.bootcamp.identity_service.dto.response.PageResponse;
+import com.bootcamp.common.dto.PageResponse;
 import com.bootcamp.identity_service.dto.response.RoleResponse;
 import com.bootcamp.identity_service.entity.Role;
 import com.bootcamp.identity_service.event.role.RoleCreatedEvent;
 import com.bootcamp.identity_service.event.role.RoleDeletedEvent;
 import com.bootcamp.identity_service.event.role.RoleModifiedEvent;
-import com.bootcamp.identity_service.exception.RecordAlreadyExistException;
-import com.bootcamp.identity_service.exception.RecordNotFoundException;
-import com.bootcamp.identity_service.exception.enums.ModuleEnum;
+import com.bootcamp.common.exception.RecordAlreadyExistException;
+import com.bootcamp.common.exception.RecordNotFoundException;
 import com.bootcamp.identity_service.mapper.RoleMapper;
 import com.bootcamp.identity_service.repository.RoleRepository;
 import com.bootcamp.identity_service.service.RoleService;
@@ -34,7 +33,7 @@ public class RoleServiceImpl implements RoleService {
     public RoleResponse create(CreateRoleRequest role) {
         if(roleRepository.existsByName(role.name())){
             String message = String.format("Role with name %s already exists",role.name());
-            throw new RecordAlreadyExistException(message, ModuleEnum.IDENTITY_SERVICE);
+            throw new RecordAlreadyExistException(message);
         }
         RoleResponse response = mapper.toResponse(roleRepository.saveAndFlush(mapper.toEntity(role)));
         eventPublisher.publishEvent(RoleCreatedEvent.build(response.id()));

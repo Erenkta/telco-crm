@@ -1,7 +1,7 @@
 package com.bootcamp.identity_service.service;
 
 import com.bootcamp.identity_service.dto.request.CreateUserRequest;
-import com.bootcamp.identity_service.dto.response.PageResponse;
+import com.bootcamp.common.dto.PageResponse;
 import com.bootcamp.identity_service.dto.response.UserResponse;
 import com.bootcamp.identity_service.entity.enums.StatusEnum;
 import org.springframework.data.domain.Pageable;
