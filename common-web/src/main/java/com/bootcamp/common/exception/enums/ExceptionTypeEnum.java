@@ -12,7 +12,5 @@ public enum ExceptionTypeEnum {
     NOT_AVAILABLE,
     PRECONDITION_FAILED,
     PRECONDITION_REQUIRED,
-    INVALID_FEE,
-    INVALID_AMOUNT,
     UNKNOWN
 }
